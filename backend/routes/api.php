@@ -156,5 +156,12 @@ Route::group(['middleware' => 'auth'], function () {
         |--------------------------------------------------------------------------
         */
         Route::resource('inquiries', 'InquiryController', ['only' => ['index', 'store']]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | DM
+        |--------------------------------------------------------------------------
+        */
+        Route::resource('post_message', 'PostMessageController', ['only' => ['index', 'store']]);
     });
 });

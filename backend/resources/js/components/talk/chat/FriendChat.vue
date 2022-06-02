@@ -11,7 +11,7 @@
 <script>
 import { ChatListComponent } from './ChatList';
 import { ChatInputComponent } from './Input.vue';
-
+import { PostMessage } from '@/utils/postMessage';
 export const FriendChatComponent = {
   components: {
     ChatListComponent,
@@ -36,9 +36,11 @@ export const FriendChatComponent = {
     },
   },
   methods: {
-    handleSubmitChat(text) {
+    async handleSubmitChat(text) {
       console.log(text);
+      await PostMessage(this.authUser.id, this.user.id, text);
       this.chatList = [
+        ...this.chatList,
         {
           id: new Date().toLocaleString(),
           type: 'right',

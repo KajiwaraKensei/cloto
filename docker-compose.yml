@@ -46,6 +46,16 @@ services:
       - 6379:6379
     volumes:
       - "./infra/redis/data:/data"
-      
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - db
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOSTS='mysqldb'
+    ports:
+      - "3000:80"
+    volumes:
+      - ./infra/phpmyadmin/sessions:/sessions
 volumes:
   db-store:
