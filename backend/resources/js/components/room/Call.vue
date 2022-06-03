@@ -608,7 +608,7 @@ export default {
 
       //*** 音声検出 ***//
       voiceDetectionObject: null, // 音声検出オブジェクト
-      speakerId: null, // 話し中ユーザーのID
+      speakerId: null, // 話し中ユーザーのIDß
 
       //*** チャット ***//
       chat: {

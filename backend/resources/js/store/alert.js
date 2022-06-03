@@ -12,13 +12,18 @@ const state = {
     timeout: null,
   },
   isSoundOn: false,
+  eventType: null,
 };
 
 const getters = {
   isSoundOn: (state) => state.isSoundOn,
+  eventType: (state) => state.eventType,
 };
 
 const mutations = {
+  setEventType(state, data) {
+    state.eventType = data.payload;
+  },
   setAlert(state, data) {
     state.type = data.type;
     state.message = data.message;
@@ -73,6 +78,11 @@ const mutations = {
 };
 
 const actions = {
+  postMessage(content, message) {
+    content.commit('setEventType', {
+      payload: message,
+    });
+  },
   success(context, message) {
     context.commit('clearAlert');
     context.commit('setAlert', {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Question;
+use App\Events\NotificationQuestion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -73,6 +74,7 @@ class QuestionController extends Controller
         if (empty($result)) {
             return response()->json(['message' => '質問の投稿に失敗しました。'], config('consts.status.INTERNAL_SERVER_ERROR'));
         }
+        broadcast(new NotificationQuestion($result));
 
         // リアルタイム更新は一旦無効化
         // broadcast(new TimelineUpdated($result));

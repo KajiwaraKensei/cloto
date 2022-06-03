@@ -21,6 +21,6 @@ export default {
 
 <style lang="scss" scoped>
 #mypage {
-  min-height: 100vh;
+  min-height: calc(100vh - 64px);
 }
 </style>

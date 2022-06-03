@@ -43,6 +43,7 @@ import VueScrollTo from 'vue-scrollto';
 import Chat from 'vue-beautiful-chat';
 import VueMasonryWall from 'vue-masonry-wall';
 import VueCalendarHeatmap from 'vue-calendar-heatmap';
+import TextareaAutosize from 'vue-textarea-autosize';
 
 Vue.use(VueWindowSizePlugin)
   .use(VueHead, {
@@ -53,8 +54,8 @@ Vue.use(VueWindowSizePlugin)
   .use(VueScrollTo)
   .use(Chat)
   .use(VueMasonryWall)
-  .use(VueCalendarHeatmap);
-
+  .use(VueCalendarHeatmap)
+  .use(TextareaAutosize);
 new Vue({
   router,
   store,

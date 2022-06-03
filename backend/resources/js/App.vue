@@ -59,7 +59,6 @@
     <Footer @logout="logout" />
 
     <!-- 問い合わせ -->
-    <Inquiry v-if="authCheck" />
 
     <!-- チュートリアル -->
     <Tutorial v-if="authCheck" />

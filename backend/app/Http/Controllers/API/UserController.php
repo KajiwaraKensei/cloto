@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Events\SeatStatusUpdated;
 use App\Notifications\UserFollowed;
+use App\Notifications\UserFriend;
+use App\Notifications\UserFriendAgree;
 use App\Events\NotificationPosted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Carbon;
+use DB;
 
 class UserController extends Controller
 {
@@ -152,6 +155,8 @@ class UserController extends Controller
         // フォロー関係の追加
         $user['following'] = $this->auth->isFollowing($user->id);
         $user['followed'] = $this->auth->isFollowed($user->id);
+        $user['friending'] = $this->auth->isFriending($user->id);
+        $user['friended'] = $this->auth->isFriended($user->id);
 
         return response()->json($user);
     }
@@ -231,7 +236,7 @@ class UserController extends Controller
      */
     public function follow(User $user)
     {
-        if ($this->auth->id == $user->id) {
+        if ($this->auth->id === $user->id) {
             return response()->json(['message' => '自分はフォローできません。'], config('consts.status.INTERNAL_SERVER_ERROR'));
         }
 
@@ -246,6 +251,83 @@ class UserController extends Controller
         if (count($result['attached'])) {
             $user->notify(new UserFollowed($this->auth));
             broadcast(new NotificationPosted($user));
+        }
+
+        return $this->show($user->id);
+    }
+
+    /**
+     * 友達かも一覧の取得
+     *
+     * @param  \App\Models\User  $user  一覧を取得するユーザー
+     * @return \Illuminate\Http\Response
+     */
+    public function maybeFriends(User $user)
+    {
+        return response()->json($user->maybeFriends);
+    }
+
+    /**
+     * 友達一覧の取得
+     *
+     * @param  \App\Models\User  $user  一覧を取得するユーザー
+     * @return \Illuminate\Http\Response
+     */
+    public function friends(User $user)
+    {
+        return response()->json($user->friends);
+    }
+
+    /**
+     * 友達追加
+     *
+     * @param  \App\Models\User  $user  友達/絶交するユーザー
+     * @return \Illuminate\Http\Response
+     */
+    public function friend(User $user)
+    {
+        $friending = $this->auth->isFriending($user->id);
+        $friended = $this->auth->isFriended($user->id);
+        if ($this->auth->id === $user->id) {
+            return response()->json(['message' => '自分は友達追加できません。'], config('consts.status.INTERNAL_SERVER_ERROR'));
+        }
+
+        // 友達追加処理
+        $result = $this->auth->friends()->toggle($user->id);
+
+        if (empty($result)) {
+            return response()->json(['message' => '友達追加に失敗しました。'], config('consts.status.INTERNAL_SERVER_ERROR'));
+        }
+
+        // 友達追加には通知を発行
+        if ($result) {
+            if(!$friended){
+                if(!$friending){
+                    //友達申請
+                    $user->notify(new UserFriend($this->auth));
+                    broadcast(new NotificationPosted($user));
+                }else{
+                    //申請承認
+                    $user->notify(new UserFriendAgree($this->auth));
+                    broadcast(new NotificationPosted($user));
+                }
+            }
+        }
+        return $this->show($user->id);
+
+    }
+    /**
+     * 友達絶交
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Http\Response
+     */
+    public function notFriend(User $user)
+    {
+        // 友達追加/絶交処理
+        $result = DB::table('friends')->where('friending_id', $user->id)->where('friended_id',$this->auth->id)->delete();
+        if (empty($result)) {
+            return response()->json(['message' => '絶交に失敗しました。'], config('consts.status.INTERNAL_SERVER_ERROR'));
         }
 
         return $this->show($user->id);
