@@ -11,4 +11,8 @@ class PostMessage extends Model
     public $incrementing = true;
     protected $dates = ['created_at', 'updated_at'];
     protected $fillable = ['channel_id', 'user_id', 'type', 'content'];
+
+    public function getPostMessages($channelId){
+        return self::where('channel_id', $channelId)->get();
+    }
 }

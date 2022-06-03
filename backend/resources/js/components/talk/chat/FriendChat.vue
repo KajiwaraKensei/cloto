@@ -12,6 +12,7 @@
 import { ChatListComponent } from './ChatList';
 import { ChatInputComponent } from './Input.vue';
 import { PostMessage } from '@/utils/postMessage';
+import { getMessage, shapingMessages } from '@/utils/postMessage';
 export const FriendChatComponent = {
   components: {
     ChatListComponent,
@@ -29,15 +30,40 @@ export const FriendChatComponent = {
     chatList: function () {
       this.scrollToEnd();
     },
+    user: async function () {
+      const res = await getMessage(this.authUser.id, this.user.id);
+      this.chatList = shapingMessages(res.data || [], this.authUser, this.user);
+    },
+    header: async function () {
+      console.log(this.header);
+    },
   },
   computed: {
     authUser() {
       return this.$store.getters['auth/user'];
     },
+    header() {
+      return this.$store.getters['alert/eventType'];
+    },
+  },
+  mounted() {
+    this.$store.subscribe(
+      function (mutation, state) {
+        console.log(mutation.type, state.alert.eventType?.user_id, this.user?.id);
+        if (
+          mutation.type === 'alert/setEventType' &&
+          state.alert.eventType?.user_id === this.user.id
+        ) {
+          this.chatList = [
+            ...this.chatList,
+            ...shapingMessages([state.alert.eventType], this.authUser, this.user),
+          ];
+        }
+      }.bind(this)
+    );
   },
   methods: {
     async handleSubmitChat(text) {
-      console.log(text);
       await PostMessage(this.authUser.id, this.user.id, text);
       this.chatList = [
         ...this.chatList,

@@ -84,7 +84,11 @@
               :style="{
                 'background-color': notification.read_at ? '' : 'rgba(246, 191, 0, 0.2)',
               }"
-              v-if="notification.type === 'UserFollowed' || notification.type === 'UserFriend' || notification.type === 'UserFriendAgree'"
+              v-if="
+                notification.type === 'UserFollowed' ||
+                notification.type === 'UserFriend' ||
+                notification.type === 'UserFriendAgree'
+              "
               @click="showItem('user', notification.username)"
             >
               <v-list-item-title>
@@ -131,9 +135,7 @@
               :style="{
                 'background-color': notification.read_at ? '' : 'rgba(246, 191, 0, 0.2)',
               }"
-              v-else-if="
-                notification.type === 'PostQuestion'
-              "
+              v-else-if="notification.type === 'PostQuestion'"
               @click="showItem('question', notification.question_id)"
             >
               <v-list-item-title>
@@ -199,13 +201,11 @@ export default {
 
         //質問の通知作成
         Echo.channel('question').listen('NotificationQuestion', (event) => {
-          this.notifications.unshift(
-            {
-              type:'PostQuestion',
-              question_id: event.id,
-              message: event.user.handlename + 'さんから質問が届きました。'
-            }
-          )
+          this.notifications.unshift({
+            type: 'PostQuestion',
+            question_id: event.id,
+            message: event.user.handlename + 'さんから質問が届きました。',
+          });
           this.unreadNotificationsCount += 1;
         });
         // 通知イベントの受信開始
@@ -216,6 +216,12 @@ export default {
           if (this.$store.getters['alert/isSoundOn']) {
             NOTIFICATION_SOUND.play();
           }
+        });
+        Echo.channel('user.' + this.authUser.id).listen('PostMessaged', (event) => {
+          if (this.$store.getters['alert/isSoundOn']) {
+            NOTIFICATION_SOUND.play();
+          }
+          this.$store.dispatch('alert/postMessage', event);
         });
       }
     },
@@ -259,12 +265,12 @@ export default {
     showItem: function (type, item) {
       if (type === 'user') {
         this.$store.dispatch('dialog/open', { type: type, username: item });
-      } 
+      }
       if (type === 'karte' || type === 'post') {
         this.$store.dispatch('dialog/open', { type: type, id: item });
-      } 
-      if(type === 'question'){
-        this.$store.dispatch('dialog/open', {  type: type, id: item });
+      }
+      if (type === 'question') {
+        this.$store.dispatch('dialog/open', { type: type, id: item });
       }
       this.markNotificationsAsRead();
     },
