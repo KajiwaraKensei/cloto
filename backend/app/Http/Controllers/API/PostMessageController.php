@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\PostMessage;
 use App\Models\Channel;
 use App\Events\PostMessaged;
-
+use App\Http\Controllers\API\UserController;
+use App\Notifications\PostMessaged as NotificationsPostMessaged;
 
 class PostMessageController extends Controller
 {
@@ -18,12 +19,16 @@ class PostMessageController extends Controller
     /** @var Channel */
     protected $channel;
 
+    /** @var UserController */
+    protected $user;
+
+
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(PostMessage $dm, Channel $channel)
+    public function __construct(PostMessage $dm, Channel $channel, UserController $user)
     {
         $this->middleware(function ($request, $next) {
             $this->auth = Auth::user();
@@ -32,6 +37,7 @@ class PostMessageController extends Controller
 
         $this->post_message = $dm;
         $this->channel = $channel;
+        $this->user = $user;
     }
 
     /**
@@ -84,9 +90,11 @@ class PostMessageController extends Controller
         if (empty($result)) {
             return response()->json(['message' => 'チャットの送信に失敗しました。'], config('consts.status.INTERNAL_SERVER_ERROR'));
         }
+        
+        $this->user->get_user($data['to'])->notify(new NotificationsPostMessaged($result));
+        $user = ['user' => $this->auth, "result" => $result];
+        broadcast(new PostMessaged($data['to'], $user));
 
-        broadcast(new PostMessaged($data['to'], $result));
-
-        return response()->json();
+        return response()->json($user);
     }
 }

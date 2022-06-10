@@ -142,6 +142,22 @@
                 {{ notification.message }}
               </v-list-item-title>
             </v-list-item>
+
+            <v-list-item
+              :style="{
+                'background-color': notification.read_at ? '' : 'rgba(246, 191, 0, 0.2)',
+              }"
+              v-if="notification.type === 'PostMessaged'"
+              @click="
+                showItem('postMessage', {
+                  id: notification.user.id,
+                })
+              "
+            >
+              <v-list-item-title>
+                {{ notification.user.username }}さんからメッセージが届いています
+              </v-list-item-title>
+            </v-list-item>
           </div>
         </v-list>
       </v-menu>
@@ -218,10 +234,19 @@ export default {
           }
         });
         Echo.channel('user.' + this.authUser.id).listen('PostMessaged', (event) => {
+          this.unreadNotificationsCount += 1;
+          console.table(event.user);
+          this.notifications = [
+            {
+              type: 'PostMessaged',
+              user: event.user,
+            },
+            ...this.notifications,
+          ];
           if (this.$store.getters['alert/isSoundOn']) {
             NOTIFICATION_SOUND.play();
           }
-          this.$store.dispatch('alert/postMessage', event);
+          this.$store.dispatch('alert/postMessage', event.result);
         });
       }
     },
@@ -271,6 +296,9 @@ export default {
       }
       if (type === 'question') {
         this.$store.dispatch('dialog/open', { type: type, id: item });
+      }
+      if (type === 'postMessage') {
+        this.$router.push('/mypage/talk/' + item.id);
       }
       this.markNotificationsAsRead();
     },

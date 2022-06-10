@@ -30,6 +30,5 @@ export function shapingMessages(messages, me, to) {
       user: me.id === message.user_id ? me : to,
     });
   });
-  console.log(me, to);
   return next;
 }

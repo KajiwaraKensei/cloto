@@ -457,6 +457,14 @@ class User extends Authenticatable implements MustVerifyEmail
                         ];
                     }
                     break;
+
+                case 'PostMessaged':
+                    // チャット
+                    $data += [
+                        'type' => 'PostMessaged',
+                        'user' => $user,
+                    ];
+                    break;
             }
 
             array_push($notifications, $data);

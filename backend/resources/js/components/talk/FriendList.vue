@@ -18,11 +18,32 @@ export const FriendListComponent = {
     return {
       users: null, // 友達/友達申請一覧
       selectUser: null,
+      selectId: null,
     };
   },
   methods: {
     handleClickUser(user) {
-      this.selectUser = user;
+      const pathname = document.location.pathname.split('/');
+      const userId = pathname[pathname.length - 1];
+
+      if (userId !== String(user.id)) {
+        this.$router.push('/mypage/talk/' + user.id).catch((err) => {});
+        this.selectUser = user;
+        this.selectId = user.id;
+      }
+    },
+    handlePopstate() {
+      const pathname = document.location.pathname.split('/');
+      const userId = pathname[pathname.length - 1];
+
+      console.log(userId, this.$route.params.userId);
+      userId &&
+        this.users.forEach((user) => {
+          if (String(user.id) === String(userId)) {
+            this.selectUser = user;
+            this.selectId = user.id;
+          }
+        });
     },
   },
   computed: {
@@ -30,11 +51,22 @@ export const FriendListComponent = {
       return this.$store.getters['auth/user'];
     },
   },
-
-  created() {
+  mounted() {
+    window.addEventListener('popstate', this.handlePopstate);
     showFriends(this.authUser.id).then((friends) => {
       this.users = friends;
+      this.$route.params.userId &&
+        this.users.forEach((user) => {
+          if (String(user.id) === String(this.$route.params.userId)) {
+            this.selectUser = user;
+            this.selectId = user.id;
+          }
+        });
     });
+  },
+
+  beforeDestroy() {
+    window.removeEventListener('popstate', this.handlePopstate);
   },
 };
 

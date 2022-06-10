@@ -1,4 +1,4 @@
-<?php
+<?php 
 
 namespace App\Http\Controllers\API;
 
@@ -11,7 +11,7 @@ use App\Notifications\UserFriendAgree;
 use App\Events\NotificationPosted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Storage; 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Carbon;
 use DB;
@@ -300,18 +300,15 @@ class UserController extends Controller
         }
 
         // 友達追加には通知を発行
-        if ($result) {
-            if(!$friended){
-                if(!$friending){
-                    //友達申請
-                    $user->notify(new UserFriend($this->auth));
-                    broadcast(new NotificationPosted($user));
-                }else{
-                    //申請承認
-                    $user->notify(new UserFriendAgree($this->auth));
-                    broadcast(new NotificationPosted($user));
-                }
+        if ($result && !$friended) {
+            if(!$friending){
+                //友達申請
+                $user->notify(new UserFriend($this->auth));
+            }else{
+                //申請承認
+                $user->notify(new UserFriendAgree($this->auth));
             }
+            broadcast(new NotificationPosted($user));
         }
         return $this->show($user->id);
 
