@@ -8,7 +8,6 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use App\Models\User;
-use App\Models\PostMessage;
 
 class PostMessaged implements ShouldBroadcast
 {
@@ -16,7 +15,7 @@ class PostMessaged implements ShouldBroadcast
 
     /** @var User */
     protected $userId;
-    /** @var PostMessage */
+
     protected $postMessage;
 
     /**
@@ -24,7 +23,7 @@ class PostMessaged implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct(string $userId, PostMessage $postMessage)
+    public function __construct(string $userId, array $postMessage)
     {
         $this->userId = $userId;
         $this->postMessage = $postMessage;
@@ -47,6 +46,6 @@ class PostMessaged implements ShouldBroadcast
      */
     public function broadcastWith()
     {
-        return $this->postMessage->toArray();
+        return $this->postMessage;
     }
 }

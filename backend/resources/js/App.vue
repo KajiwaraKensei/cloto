@@ -101,7 +101,7 @@ export default {
       issuedTabId: false, // 複数タブ制御フラグ
       isOffline: false, // オフライン状態
       setOnlineTimer: null, // オンライン状態の通知制御
-      isOpenDrawer: false, // ドロワーメニューの表示制御
+      //isOpenDrawer: false, // ドロワーメニューの表示制御
       announce: '', // アナウンス内容
     };
   },
@@ -117,6 +117,16 @@ export default {
     },
     authUser() {
       return this.$store.getters['auth/user'];
+    },
+    isOpenDrawer: {
+      get() {
+        return this.$store.getters['drawer/isOpen'];
+      },
+      set(value) {
+        console.log(value);
+        if (this.$store.getters['drawer/isOpen'] !== value)
+          this.$store.dispatch('drawer/event', value);
+      },
     },
   },
   watch: {

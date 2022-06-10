@@ -10,7 +10,6 @@ import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 
 import store from './store';
-
 import index from '@/views/Index';
 import terms from '@/views/service/Terms';
 import login from '@/views/Login';
@@ -23,12 +22,11 @@ import profile from '@/views/mypage/Profile';
 import follower from '@/views/mypage/Follower';
 import friend from '@/views/mypage/Friends';
 import post from '@/views/mypage/Post';
-import mystudy from '@/views/mystudy/Mystudy';
-import progress from '@/views/mystudy/Progress';
 import karte from '@/views/mystudy/Karte';
-import docs from '@/views/mystudy/docs/Docs';
 import notFound from '@/views/errors/NotFound';
 import talkView from '@/views/talk';
+
+const newLocal = 'timeline';
 const router = new VueRouter({
   mode: 'history',
   routes: [
@@ -51,6 +49,7 @@ const router = new VueRouter({
       meta: { isPublic: true },
     },
     {
+       path: newLocal,
       path: '/home',
       component: home,
       children: [
@@ -87,6 +86,11 @@ const router = new VueRouter({
         },
         {
           path: 'talk',
+          name: 'talk',
+          component: talkView,
+        },
+        {
+          path: 'talk/:userId',
           name: 'talk',
           component: talkView,
         },

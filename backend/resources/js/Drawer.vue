@@ -23,7 +23,7 @@
         </v-list-item-content>
       </v-list-item>
 
-    <!-- <v-list-item exact :to="{ name: 'mystudy' }">
+      <!-- <v-list-item exact :to="{ name: 'mystudy' }">
             <v-list-item-icon>
               <v-icon>mdi-note-text</v-icon>
             </v-list-item-icon>
@@ -39,7 +39,7 @@
         <v-list-item-content>
           <v-list-item-title>マイページ</v-list-item-title>
         </v-list-item-content>
-      </v-list-item> 
+      </v-list-item>
       <v-list-item-group color="success">
         <v-list-item-icon>
           <v-icon>mdi-AccountSchoolOutline</v-icon>
@@ -64,17 +64,17 @@
         </v-tooltip>
       </v-list-item-group>
       <div class="pa-2" v-if="$route.name === 'floor'">
-      <v-btn
-        depressed
-        block
-        color="#f6bf00"
-        dark
-        :to="{ name: 'room', params: { roomId: $route.params.roomId } }"
-        :disabled="authUser.seat !== null"
-      >
-        入室
-      </v-btn>
-    </div>
+        <v-btn
+          depressed
+          block
+          color="#f6bf00"
+          dark
+          :to="{ name: 'room', params: { roomId: $route.params.roomId } }"
+          :disabled="authUser.seat !== null"
+        >
+          入室
+        </v-btn>
+      </div>
     </v-list>
 
     <template v-slot:append>
@@ -101,31 +101,13 @@ export default {
     authUser() {
       return this.$store.getters['auth/user'];
     },
-  },
-  data() {
-    return {
-      floors: [], // ドロワーメニュー用階層一覧
-    };
-  },
-  async mounted() {
-    let response = await axios.get('/api/rooms');
-    response.data.forEach((room) => {
-      // 着席者数のカウント
-      let userNum = 0;
-      room.sections.forEach((section) => {
-        section.seats.forEach((seat) => {
-          if (seat.user) {
-            userNum += 1;
-          }
-        });
-      });
-      this.floors.push({
-        id: room.id,
-        name: room.name,
-        userNum: userNum
-      });
-    });
-    return;
+
+    value() {
+      return this.$store.getters['drawer/isOpen'];
+    },
+    floors() {
+      return this.$store.getters['drawer/floors'];
+    },
   },
 };
 </script>
